@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const keys = require('../config/keys');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 const route = express.Router();
 const ONEHOUR = 60 * 60;
 
@@ -99,6 +100,16 @@ route.post('/register', (req, res) => {
             });
         })
         .catch(err => console.log(err));
+});
+
+route.get('/users', auth, (req, res) => {
+    const userid = req.user.userid;
+    User.findById(userid)
+        .then(user => res.status(200).json({ 
+            id: user.id,
+            name: user.name,
+            email: user.email
+        }));
 });
 
 module.exports = route;

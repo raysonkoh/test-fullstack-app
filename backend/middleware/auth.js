@@ -10,22 +10,15 @@ function auth(req, res, next) {
             msg: 'Session invalid. Please log in again'
         });
     } else {
-        jwt.verify(token, keys.jwtSecret, (err, decoded) => {
-            if (err) throw err;
-
-            const userid = decoded.userid;
-            User.findById(userid)
-                .then(user => {
-                    if (!user) {
-                        res.status(401).json({
-                            msg: 'Session invalid. Please log in again'
-                        });
-                    } else {
-                        next();
-                    }
-                })
-                .catch(error => console.log(error));
-        });
+        try {
+            const decoded  = jwt.verify(token, keys.jwtSecret);
+            req.user = decoded;
+            next()
+        } catch (e) {
+            res.status(400).json({ 
+                msg: 'Invalid session. Please login again' 
+            });            
+        }
     }
 }
 
