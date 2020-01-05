@@ -1,17 +1,8 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const route = express.Router();
-
-route.get('/', (req, res) => {
-    User.find({})
-        .then(users => {
-            res.status(200).json({
-                msg: 'Hello world!',
-                users: users
-            });
-        })
-        .catch(err => console.log(err));
-});
 
 route.post('/login', (req, res) => {
     const { email, password } = req.body;
@@ -59,19 +50,27 @@ route.post('/register', (req, res) => {
                 });
             }
 
+
             newUser = new User({
                 name, 
                 email, 
                 password
             });
-            newUser.save()
-                .then(usr => {
-                    return res.status(200).json({
-                        msg: 'Successfully created user.',
-                        name,
-                        email
-                    });
+
+            bcrypt.genSalt(10, (err, salt) => {
+                if (err) throw err;
+                bcrypt.hash(newUser.password, salt, (err, hash) => {
+                    newUser.password = hash;
+                    newUser.save()
+                        .then(usr => {
+                            return res.status(200).json({
+                                msg: 'Successfully created user.',
+                                name,
+                                email
+                            });
+                        });
                 });
+            });
         })
         .catch(err => console.log(err));
 });
