@@ -35,7 +35,6 @@ route.post('/login', (req, res) => {
                 });
 
                 const userid = decoded.userid;
-                console.log(userid);
                 User.findById(userid)
                     .then(usr => {
                         if (!user) return res.status(401).json({

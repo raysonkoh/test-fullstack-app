@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const keys = require('./config/keys');
 const PORT = process.env.PORT || 3000;
 const authRoutes = require('./routes/authRoutes');
+const protectedRoutes = require('./routes/protectedRoutes');
 
 const db = keys.mongoURI;
 mongoose.connect(db, {
@@ -16,5 +17,6 @@ const app = express();
 app.use(express.json());
 
 app.use('/auth', authRoutes);
+app.use('/', protectedRoutes);
 
 app.listen(PORT, () => console.log(`Server started at ${PORT}!`));
