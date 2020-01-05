@@ -4,8 +4,8 @@ const keys = require('../config/keys');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
-const route = express.Router();
 const ONEHOUR = 60 * 60;
+const route = express.Router();
 
 route.post('/login', (req, res) => {
     const { email, password } = req.body;
