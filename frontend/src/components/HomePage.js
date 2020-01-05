@@ -19,6 +19,8 @@ function HomePage(props) {
             .then(res => {
                 console.log(res);
                 if (res.status === 200) {
+                    const token = res.data.token;
+                    localStorage.setItem('token', token);
                     props.history.push('/dashboard');
                 } else {
                     setError(res.data.msg);

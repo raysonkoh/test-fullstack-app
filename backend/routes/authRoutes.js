@@ -95,11 +95,19 @@ route.post('/register', (req, res) => {
 route.get('/users', auth, (req, res) => {
     const userid = req.user.userid;
     User.findById(userid)
-        .then(user => res.status(200).json({ 
-            id: user.id,
-            name: user.name,
-            email: user.email
-        }));
+        .then(user => {
+            if (!user) {
+                res.status(401).json({
+                    msg: 'Invalid token'
+                });
+            } else {
+                res.status(200).json({ 
+                    id: user.id,
+                    name: user.name,
+                    email: user.email
+                });
+            }
+        });
 });
 
 module.exports = route;
