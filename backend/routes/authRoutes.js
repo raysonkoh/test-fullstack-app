@@ -20,16 +20,21 @@ route.post('/login', (req, res) => {
                 });
             }
 
-            if (password === user.password) {
-                return res.status(200).json({
-                    msg: 'Login successful!',
-                    email
-                })
-            } else {
-                return res.status(401).json({
-                    msg: 'Password and Email are incorrect',
-                });
-            }
+            bcrypt.compare(password, user.password, (err, isMatch) => {
+                if (err) throw err;
+
+                if (isMatch) {
+                    return res.status(200).json({
+                        msg: 'Login successful!',
+                        name: user.name,
+                        email
+                    })
+                } else {
+                    return res.status(401).json({
+                        msg: 'Password and Email are incorrect',
+                    });
+                }
+            })
         })
         .catch(err => console.log(err));
 });
