@@ -22,44 +22,31 @@ route.post('/login', (req, res) => {
                 });
             }
 
-            const token = req.headers['authorization'].split(' ')[1];
-            if (!token) {
-                return res.status(401).json({
-                    msg: 'Session expired. Please log in again'
-                });
-            }
+            bcrypt.compare(password, user.password, (err, isMatch) => {
+                if (err) throw err;
 
-            jwt.verify(token, keys.jwtSecret, (err, decoded) => {
-                if (err) return res.status(401).json({
-                    msg: 'Invalid session. Please log in again'
-                });
-
-                const userid = decoded.userid;
-                User.findById(userid)
-                    .then(usr => {
-                        if (!user) return res.status(401).json({
-                            msg: 'Invalid session. Please log in again'
-                        });
-
-                        bcrypt.compare(password, user.password, (err, isMatch) => {
+                if (isMatch) {
+                    jwt.sign(
+                        { userid: user.id }, 
+                        keys.jwtSecret, 
+                        { expiresIn: ONEHOUR }, 
+                        (err, token) => {
                             if (err) throw err;
-
-                            if (isMatch) {
-                                return res.status(200).json({
-                                    msg: 'Login successful!',
-                                    name: user.name,
-                                    email
-                                })
-                            } else {
-                                return res.status(401).json({
-                                    msg: 'Password and Email are incorrect',
-                                });
-                            }
-                        });            
+                            return res.status(200).json({
+                                msg: 'Login successful!',
+                                id: user.id,
+                                token,
+                                name: user.name,
+                                email
+                            });
+                        });
+                } else {
+                    return res.status(400).json({
+                        msg: 'Password and/or Email are incorrect',
                     });
-            });
-        })
-        .catch(err => console.log(err));
+                }
+            });            
+        });
 });
 
 route.post('/register', (req, res) => {
@@ -91,19 +78,23 @@ route.post('/register', (req, res) => {
                 bcrypt.hash(newUser.password, salt, (err, hash) => {
                     newUser.password = hash;
 
-                    jwt.sign({ userid: newUser.id }, keys.jwtSecret, { expiresIn: ONEHOUR }, (err, token) => {
-                        if (err) throw err;
-
-                        newUser.save()
-                            .then(usr => {
-                                return res.status(200).json({
-                                    msg: 'Successfully created user.',
-                                    token,
-                                    name,
-                                    email
+                    newUser.save()
+                        .then(usr => {
+                            jwt.sign(
+                                { userid: newUser.id }, 
+                                keys.jwtSecret, 
+                                { expiresIn: ONEHOUR }, 
+                                (err, token) => {
+                                    if (err) throw err;
+                                    return res.status(200).json({
+                                        msg: 'Successfully created user.',
+                                        id: user.id,
+                                        token,
+                                        name,
+                                        email
+                                    });
                                 });
-                            });
-                    });
+                        });
                 });
             });
         })
