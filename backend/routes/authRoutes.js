@@ -13,6 +13,36 @@ route.get('/', (req, res) => {
         .catch(err => console.log(err));
 });
 
+route.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({
+            msg: 'Name, Email and Password are required'
+        });
+    }
+
+    User.findOne({ email: email })
+        .then(user => {
+            if (!user) {
+                return res.status(400).json({
+                    msg: 'No such user exists'
+                });
+            }
+
+            if (password === user.password) {
+                return res.status(200).json({
+                    msg: 'Login successful!',
+                    email
+                })
+            } else {
+                return res.status(401).json({
+                    msg: 'Password and Email are incorrect',
+                });
+            }
+        })
+        .catch(err => console.log(err));
+});
+
 route.post('/register', (req, res) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
