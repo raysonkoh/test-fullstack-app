@@ -3,7 +3,8 @@ import { Redirect } from 'react-router-dom';
 import customAxios from '../config/customAxios';
 import { Container, Box, TextField, Button } from '@material-ui/core';
 
-function HomePage(props) {
+function Register(props) {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showErrors, setShowErrors] = useState(false);
@@ -11,15 +12,15 @@ function HomePage(props) {
 
     function submitHandler(event) {
         const data = {
+            name,
             email,
             password
         };
 
-        customAxios.post('./auth/login', data)
+        customAxios.post('./auth/register', data)
             .then(res => {
-                console.log(res);
                 if (res.status === 200) {
-                    props.history.push('/dashboard');
+                    props.history.push('/');
                 } else {
                     setError(res.data.msg);
                     setShowErrors(true);
@@ -41,8 +42,18 @@ function HomePage(props) {
 
     return (
         <Container>
-            <h1 style={{ textAlign: 'center' }}>This is the Homepage!</h1>
-            {showErrors && renderError(error)} 
+            <h1 style={{ textAlign: 'center' }}>This is the Register Accounts Page!</h1>
+            {showErrors && renderError(error)}
+            <Box style={{ margin: '0.5em 2em' }}>  
+                <TextField 
+                    id="name" 
+                    label="Name" 
+                    variant="outlined" 
+                    fullWidth
+                    onChange={e => setName(e.target.value)}
+                    value={name}
+                />
+            </Box> 
             <Box style={{ margin: '0.5em 2em' }}>  
                 <TextField 
                     type="email"
@@ -68,15 +79,15 @@ function HomePage(props) {
                     <Button 
                         variant="contained"
                         color="secondary"
-                        onClick={e => props.history.push('/register')}>Register New Account</Button>
+                        onClick={e => props.history.push('/')}>Go to HomePage</Button>
                     <Button 
                         variant="contained" 
                         color="primary"
-                        onClick={submitHandler}>Login</Button>
+                        onClick={submitHandler}>Register</Button>
                 </Box>
             </Box>
         </Container>
     )
 }
 
-export default HomePage;
+export default Register;

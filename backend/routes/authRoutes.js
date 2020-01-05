@@ -80,27 +80,17 @@ route.post('/register', (req, res) => {
                     newUser.password = hash;
 
                     newUser.save()
-                        .then(usr => {
-                            jwt.sign(
-                                { userid: newUser.id }, 
-                                keys.jwtSecret, 
-                                { expiresIn: ONEHOUR }, 
-                                (err, token) => {
-                                    if (err) throw err;
-                                    return res.status(200).json({
-                                        msg: 'Successfully created user.',
-                                        id: user.id,
-                                        token,
-                                        name,
-                                        email
-                                    });
-                                });
-                        });
+                        .then(usr => res.status(200).json({
+                            msg: 'Successfully created user.',
+                            id: newUser.id,
+                            name,
+                            email
+                        }));
                 });
             });
         })
         .catch(err => console.log(err));
-});
+})
 
 route.get('/users', auth, (req, res) => {
     const userid = req.user.userid;
