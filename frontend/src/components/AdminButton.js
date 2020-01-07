@@ -4,20 +4,20 @@ import customAxios from '../config/customAxios';
 import {UserContext} from '../contexts/UserContext';
 
 function AdminButton(props) {
-  const [token, customSetToken] = useContext(UserContext);
+  const [user, customSetUser] = useContext(UserContext);
   const onClick = e => {
     customAxios
-      .get('./auth/users', {headers: {authorization: `Bearer ${token}`}})
+      .get('./auth/users', {headers: {authorization: `Bearer ${user.token}`}})
       .then(res => {
         if (res.status === 200) {
           props.history.push('/admin');
         } else {
-          customSetToken(null);
+          customSetUser(null);
           props.history.push('/');
         }
       })
       .catch(err => {
-        customSetToken(null);
+        customSetUser(null);
         props.history.push('/');
       });
   };

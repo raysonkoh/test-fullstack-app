@@ -3,9 +3,9 @@ import {Redirect} from 'react-router-dom';
 import {UserContext} from '../contexts/UserContext';
 
 function AuthenticatedComponent(props) {
-  const [token, customSetToken] = useContext(UserContext);
+  const [user, customSetUser] = useContext(UserContext);
 
-  return token === null ? <Redirect to="/" /> : <div>{props.children}</div>;
+  return user === null ? <Redirect to="/" /> : <div>{props.children}</div>;
 }
 
 export default AuthenticatedComponent;

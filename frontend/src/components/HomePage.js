@@ -8,7 +8,7 @@ function HomePage(props) {
   const [password, setPassword] = useState('');
   const [showErrors, setShowErrors] = useState(false);
   const [error, setError] = useState('');
-  const [token, customSetToken] = useContext(UserContext);
+  const [user, customSetUser] = useContext(UserContext);
 
   function submitHandler(event) {
     const data = {
@@ -20,8 +20,8 @@ function HomePage(props) {
       .post('./auth/login', data)
       .then(res => {
         if (res.status === 200) {
-          const token = res.data.token;
-          customSetToken(token);
+          const {token, name} = res.data;
+          customSetUser({token, name});
           props.history.push('/dashboard');
         } else {
           setError(res.data.msg);

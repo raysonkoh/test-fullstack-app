@@ -3,20 +3,25 @@ import React, {createContext, useState} from 'react';
 export const UserContext = createContext();
 
 export function UserProvider(props) {
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [user, setUser] = useState({
+    token: localStorage.getItem('token'),
+    name: localStorage.getItem('name'),
+  });
 
-  const customSetToken = val => {
+  const customSetUser = val => {
     if (val === null) {
       localStorage.removeItem('token');
-      setToken(null);
+      localStorage.removeItem('name');
+      setUser(null);
     } else {
-      localStorage.setItem('token', val);
-      setToken(val);
+      localStorage.setItem('token', val.token);
+      localStorage.setItem('name', val.name);
+      setUser(val);
     }
   };
 
   return (
-    <UserContext.Provider value={[token, customSetToken]}>
+    <UserContext.Provider value={[user, customSetUser]}>
       {props.children}
     </UserContext.Provider>
   );

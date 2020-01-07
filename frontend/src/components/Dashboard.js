@@ -5,15 +5,16 @@ import onClickLogout from '../helpers/onClickLogout';
 import AdminButton from './AdminButton';
 
 function Dashboard(props) {
-  const [token, customSetToken] = useContext(UserContext);
+  const [user, customSetUser] = useContext(UserContext);
 
   return (
     <Container>
       <h1 style={{textAlign: 'center'}}>This is the Dashboard!</h1>
+      <h1 style={{textAlign: 'center'}}>Welcome, {user.name}!</h1>
       <Button
         variant="contained"
         color="primary"
-        onClick={e => onClickLogout(e, props, customSetToken)}>
+        onClick={e => onClickLogout(e, props, customSetUser)}>
         Logout
       </Button>
       <AdminButton history={props.history} />

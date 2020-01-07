@@ -1,5 +1,5 @@
-const onClickLogout = (e, props, customSetToken) => {
-  customSetToken(null);
+const onClickLogout = (e, props, customSetUser) => {
+  customSetUser(null);
   props.history.push('/');
 };
 
