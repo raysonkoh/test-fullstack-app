@@ -1,32 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { withRouter, Redirect } from 'react-router-dom';
-import customAxios from '../config/customAxios';
+import React, {useContext} from 'react';
+import {Redirect} from 'react-router-dom';
+import {UserContext} from '../contexts/UserContext';
 
 function AuthenticatedComponent(props) {
-    const [userid, setUserid] = useState(null);
+  const [token, customSetToken] = useContext(UserContext);
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            props.history.push('/');
-        }
-
-        customAxios.get('./auth/users', { headers: { authorization: `Bearer ${token}` } })
-            .then(res => {
-                setUserid(res.data.id);
-            })
-            .catch(err => {
-                localStorage.removeItem('token');
-                props.history.push('/');
-            });
-    });
-
-
-    return userid === null ? (
-        <div>Loading...</div>
-    ) : (
-        <div>{props.children}</div>
-    );
+  return token === null ? <Redirect to="/" /> : <div>{props.children}</div>;
 }
 
-export default withRouter(AuthenticatedComponent);
+export default AuthenticatedComponent;

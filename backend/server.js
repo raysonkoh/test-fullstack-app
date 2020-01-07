@@ -2,17 +2,18 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const keys = require('./config/keys');
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 const authRoutes = require('./routes/authRoutes');
 const protectedRoutes = require('./routes/protectedRoutes');
 
 const db = keys.mongoURI;
-mongoose.connect(db, {
+mongoose
+  .connect(db, {
     useNewUrlParser: true,
-    UseCreateNewIndex: true
-})
-    .then(() => console.log('Connected to mongoDB!'))
-    .catch(err => console.log(err));
+    UseCreateNewIndex: true,
+  })
+  .then(() => console.log('Connected to mongoDB!'))
+  .catch(err => console.log(err));
 
 const app = express();
 app.use(cors());

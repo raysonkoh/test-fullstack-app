@@ -8,107 +8,105 @@ const ONEHOUR = 60 * 60;
 const route = express.Router();
 
 route.post('/login', (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return res.status(400).json({
-            msg: 'Name, Email and Password are required'
-        });
+  const {email, password} = req.body;
+  if (!email || !password) {
+    return res.status(400).json({
+      msg: 'Name, Email and Password are required',
+    });
+  }
+
+  User.findOne({email: email}).then(user => {
+    if (!user) {
+      return res.status(400).json({
+        msg: 'No such user exists',
+      });
     }
 
-    User.findOne({ email: email })
-        .then(user => {
-            if (!user) {
-                return res.status(400).json({
-                    msg: 'No such user exists'
-                });
-            }
+    bcrypt.compare(password, user.password, (err, isMatch) => {
+      if (err) throw err;
 
-            bcrypt.compare(password, user.password, (err, isMatch) => {
-                if (err) throw err;
-
-                if (isMatch) {
-                    jwt.sign(
-                        { userid: user.id }, 
-                        keys.jwtSecret, 
-                        { expiresIn: ONEHOUR }, 
-                        (err, token) => {
-                            if (err) throw err;
-                            return res.status(200).json({
-                                msg: 'Login successful!',
-                                id: user.id,
-                                token,
-                                name: user.name,
-                                email
-                            });
-                        });
-                } else {
-                    return res.status(400).json({
-                        msg: 'Password and/or Email are incorrect',
-                    });
-                }
-            });            
+      if (isMatch) {
+        jwt.sign(
+          {userid: user.id},
+          keys.jwtSecret,
+          {expiresIn: ONEHOUR},
+          (err, token) => {
+            if (err) throw err;
+            return res.status(200).json({
+              msg: 'Login successful!',
+              id: user.id,
+              token,
+              name: user.name,
+              email,
+            });
+          },
+        );
+      } else {
+        return res.status(400).json({
+          msg: 'Password and/or Email are incorrect',
         });
+      }
+    });
+  });
 });
 
 route.post('/register', (req, res) => {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
+  const {name, email, password} = req.body;
+  if (!name || !email || !password) {
+    return res.status(400).json({
+      msg: 'Name, Email and Password are required',
+    });
+  }
+
+  User.findOne({email: email})
+    .then(user => {
+      if (user) {
         return res.status(400).json({
-            msg: 'Name, Email and Password are required'
+          msg: 'User already exists',
         });
-    }
+      }
 
-    User.findOne({ email: email })
-        .then(user => {
-            if (user) {
-                return res.status(400).json({
-                    msg: 'User already exists'
-                });
-            }
+      const newUser = new User({
+        name,
+        email,
+        password,
+      });
 
+      bcrypt.genSalt(10, (err, salt) => {
+        if (err) throw err;
 
-            newUser = new User({
-                name, 
-                email, 
-                password
-            });
+        bcrypt.hash(newUser.password, salt, (err, hash) => {
+          newUser.password = hash;
 
-            bcrypt.genSalt(10, (err, salt) => {
-                if (err) throw err;
-
-                bcrypt.hash(newUser.password, salt, (err, hash) => {
-                    newUser.password = hash;
-
-                    newUser.save()
-                        .then(usr => res.status(200).json({
-                            msg: 'Successfully created user.',
-                            id: newUser.id,
-                            name,
-                            email
-                        }));
-                });
-            });
-        })
-        .catch(err => console.log(err));
-})
+          newUser.save().then(usr =>
+            res.status(200).json({
+              msg: 'Successfully created user.',
+              id: newUser.id,
+              name,
+              email,
+            }),
+          );
+        });
+      });
+    })
+    .catch(err => console.log(err));
+});
 
 route.get('/users', auth, (req, res) => {
-    console.log('here');
-    const userid = req.user.userid;
-    User.findById(userid)
-        .then(user => {
-            if (!user) {
-                res.status(401).json({
-                    msg: 'Invalid token'
-                });
-            } else {
-                res.status(200).json({ 
-                    id: user.id,
-                    name: user.name,
-                    email: user.email
-                });
-            }
-        });
+  const userid = req.user.userid;
+  User.findById(userid).then(user => {
+    if (!user) {
+      res.status(401).json({
+        msg: 'Invalid token',
+      });
+    } else {
+      res.status(200).json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      });
+    }
+  });
 });
 
 module.exports = route;
