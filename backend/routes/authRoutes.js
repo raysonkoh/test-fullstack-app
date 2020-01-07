@@ -3,50 +3,20 @@ const bcrypt = require('bcryptjs');
 const keys = require('../config/keys');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const auth = require('../middleware/auth');
+//const auth = require('../middleware/auth');
+const passport = require('../config/passportConfig');
+const isAuthenticated = require('../middleware/isAuthenticated');
 const ONEHOUR = 60 * 60;
 const route = express.Router();
 
-route.post('/login', (req, res) => {
-  const {email, password} = req.body;
-  if (!email || !password) {
-    return res.status(400).json({
-      msg: 'Name, Email and Password are required',
-    });
-  }
-
-  User.findOne({email: email}).then(user => {
-    if (!user) {
-      return res.status(400).json({
-        msg: 'No such user exists',
-      });
-    }
-
-    bcrypt.compare(password, user.password, (err, isMatch) => {
-      if (err) throw err;
-
-      if (isMatch) {
-        jwt.sign(
-          {userid: user.id},
-          keys.jwtSecret,
-          {expiresIn: ONEHOUR},
-          (err, token) => {
-            if (err) throw err;
-            return res.status(200).json({
-              msg: 'Login successful!',
-              id: user.id,
-              token,
-              name: user.name,
-              email,
-            });
-          },
-        );
-      } else {
-        return res.status(400).json({
-          msg: 'Password and/or Email are incorrect',
-        });
-      }
-    });
+route.post('/login', passport.authenticate('local'), (req, res) => {
+  const user = req.user;
+    req.session.save();
+  return res.status(200).json({
+    msg: 'Login successful!',
+    id: user.id,
+    name: user.name,
+    email: user.email,
   });
 });
 
@@ -92,8 +62,9 @@ route.post('/register', (req, res) => {
     .catch(err => console.log(err));
 });
 
-route.get('/users', auth, (req, res) => {
-  const userid = req.user.userid;
+route.get('/users', isAuthenticated, (req, res) => {
+    req.session.save();
+  const userid = req.user.id;
   User.findById(userid).then(user => {
     if (!user) {
       res.status(401).json({

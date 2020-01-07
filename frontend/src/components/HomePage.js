@@ -20,8 +20,7 @@ function HomePage(props) {
       .post('./auth/login', data)
       .then(res => {
         if (res.status === 200) {
-          const {token, name} = res.data;
-          customSetUser({token, name});
+          customSetUser({token: null, name: res.data.name});
           props.history.push('/dashboard');
         } else {
           setError(res.data.msg);
