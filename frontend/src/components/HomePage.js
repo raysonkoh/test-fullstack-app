@@ -17,7 +17,6 @@ function HomePage(props) {
 
         customAxios.post('./auth/login', data)
             .then(res => {
-                console.log(res);
                 if (res.status === 200) {
                     const token = res.data.token;
                     localStorage.setItem('token', token);

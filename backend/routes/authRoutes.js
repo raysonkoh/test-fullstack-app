@@ -93,6 +93,7 @@ route.post('/register', (req, res) => {
 })
 
 route.get('/users', auth, (req, res) => {
+    console.log('here');
     const userid = req.user.userid;
     User.findById(userid)
         .then(user => {
