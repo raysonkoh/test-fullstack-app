@@ -11,13 +11,16 @@ const route = express.Router();
 
 route.post('/login', passport.authenticate('local'), (req, res) => {
   const user = req.user;
-    console.log(req.isAuthenticated());
   return res.status(200).json({
     msg: 'Login successful!',
     id: user.id,
     name: user.name,
     email: user.email,
   });
+});
+
+route.get('/logout', (req, res) => {
+  req.logout();
 });
 
 route.post('/register', (req, res) => {

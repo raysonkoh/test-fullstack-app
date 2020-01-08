@@ -5,7 +5,7 @@ import {UserContext} from '../contexts/UserContext';
 function AuthenticatedComponent(props) {
   const [user, customSetUser] = useContext(UserContext);
 
-  return user === null ? <Redirect to="/" /> : <div>{props.children}</div>;
+  return (user.token === null && user.name === null)  ? <Redirect to="/" /> : <div>{props.children}</div>;
 }
 
 export default AuthenticatedComponent;

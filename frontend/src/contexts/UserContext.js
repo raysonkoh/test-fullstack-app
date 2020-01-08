@@ -12,7 +12,10 @@ export function UserProvider(props) {
     if (val === null) {
       localStorage.removeItem('token');
       localStorage.removeItem('name');
-      setUser(null);
+      setUser({
+        token: null,
+        name: null,
+      });
     } else {
       localStorage.setItem('token', val.token);
       localStorage.setItem('name', val.name);
