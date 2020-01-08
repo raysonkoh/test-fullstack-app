@@ -1,6 +1,6 @@
 function isAuthenticated(req, res, next) {
-  console.log(req.session);
-  if (req.user) {
+    console.log(req.isAuthenticated());
+  if (req.isAuthenticated()) {
     return next();
   } else {
     return res.status(401).json({

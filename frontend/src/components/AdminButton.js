@@ -9,7 +9,7 @@ function AdminButton(props) {
   const onClick = e => {
       console.log('click!');
     customAxios
-      .get('auth/users', {withCredentials: true})
+      .get('auth/users')
       .then(res => {
         console.log(res);
         if (res.status === 200) {

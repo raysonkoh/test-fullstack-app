@@ -7,8 +7,8 @@ passport.use(
     {
       usernameField: 'email',
     },
-    (username, password, done) => {
-      User.findOne({email: username}).then(user => {
+    (email, password, done) => {
+      User.findOne({email: email}).then(user => {
         if (!user) {
           return done(null, false);
         }
@@ -28,12 +28,12 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-    console.log('serializing user...');
+  console.log('serializing user...');
   done(null, user.id);
 });
 
 passport.deserializeUser((id, done) => {
-    console.log('deserializing user...');
+  console.log('deserializing user...');
   User.findById(id)
     .then(user => {
       done(null, user);

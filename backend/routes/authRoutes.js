@@ -11,7 +11,7 @@ const route = express.Router();
 
 route.post('/login', passport.authenticate('local'), (req, res) => {
   const user = req.user;
-    req.session.save();
+    console.log(req.isAuthenticated());
   return res.status(200).json({
     msg: 'Login successful!',
     id: user.id,
@@ -63,7 +63,6 @@ route.post('/register', (req, res) => {
 });
 
 route.get('/users', isAuthenticated, (req, res) => {
-    req.session.save();
   const userid = req.user.id;
   User.findById(userid).then(user => {
     if (!user) {
